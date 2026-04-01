@@ -9,7 +9,7 @@ const mainWindow = () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         },
-        icon: __dirname + '/assets/icon-v3.ico'
+        icon: path.join(__dirname, 'icon-v3.png')
     });
     win.removeMenu();
     win.loadFile('./view/index.html');

@@ -4,9 +4,9 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
-    name: 'Disparadoor de Emails',           
-    executableName: 'disparador-emails', 
-    icon: './assets/icons/icon',
+    name: 'Disparadoor de Emails',
+    executableName: 'disparador-emails',
+    icon: './assets/icons/icon-v3',
   },
   rebuildConfig: {},
   makers: [
@@ -16,6 +16,8 @@ module.exports = {
       platforms: ['win32'],
       config: {
         name: 'disparador-emails',
+        icon: './assets/icons/icon-v3.ico',
+        setupIcon: './assets/icons/icon-v3.ico'
       },
     },
     {
