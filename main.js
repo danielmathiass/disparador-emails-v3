@@ -8,9 +8,10 @@ const mainWindow = () => {
         resizable: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
-        }
+        },
+        icon: __dirname + '/assets/icon-v3.ico'
     });
-    //win.removeMenu();
+    win.removeMenu();
     win.loadFile('./view/index.html');
 }
 

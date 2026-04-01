@@ -561,9 +561,12 @@ body {
 
 .pre_conteudo {
     max-width: $container-width;
+    overflow-y: auto;
+
     margin: $spacing-xl auto;
     padding: $spacing-lg;
     @include card;
+
 
     .folha_caderno {
         border: 1px solid $color-border-light;
