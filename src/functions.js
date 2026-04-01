@@ -73,7 +73,13 @@ function renderizarTabela() {
     });
 };
 
+let abortController = null;
+let cancelado = false;
+
 async function enviarEmails(arquivo) {
+
+    abortController = new AbortController();
+    cancelado = false;
     try {
         const arquivoValidado = await validarCabecalho(arquivo);
         const arquivoJson = await tranformarJSON(arquivoValidado);
@@ -81,6 +87,11 @@ async function enviarEmails(arquivo) {
         const assuntoEmail = document.getElementById('assunto_email').value;
         const corpoEmail = document.getElementById('mensagem_email').value;
         const anexoForm = document.getElementById('arquivo_formulario').files[0];
+
+        const orgao = localStorage.getItem('orgao');
+        if (!orgao) {
+            throw new Error('Orgão não configurado.');
+        }
 
         processos.length = 0;
         arquivoJson.forEach(item => {
@@ -94,6 +105,13 @@ async function enviarEmails(arquivo) {
 
         const url = 'https://ext.api.email.seati.ma.gov.br/api/mensagens/enviar';
         for (let i = 0; i < processos.length; i++) {
+
+            if (cancelado === true) {
+                processos[i].status = 'cancelado';
+                renderizarTabela();
+                continue;
+            }
+
             processos[i].status = 'enviando';
             renderizarTabela();
 
@@ -118,8 +136,9 @@ async function enviarEmails(arquivo) {
             try {
                 const tokenAPI = localStorage.getItem('tokenAPI');
                 if (!tokenAPI) {
-                    throw new Error('Token API é obrigatório para enviar os e-mails.');
+                    throw new Error('Token API não configurado.');
                 }
+
                 const resposta = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -127,6 +146,7 @@ async function enviarEmails(arquivo) {
                         'Authorization': `Basic ${tokenAPI}`,
                     },
                     body: JSON.stringify(dadosEnvio),
+                    signal: abortController.signal,
                 });
 
                 if (!resposta.ok) {
@@ -134,29 +154,50 @@ async function enviarEmails(arquivo) {
                     throw new Error(`Erro HTTP: ${resposta.status} - ${erroBody}`);
                 }
 
+                const respostaJson = await resposta.json();
+                console.log('Resposta da API:', respostaJson);
+                console.log('Dados enviados:', dadosEnvio);
+
                 processos[i].status = 'enviado';
             } catch (erro) {
-                console.log(`Erro ao enviar para ${processos[i].email}:`, erro);
-                processos[i].status = 'erro';
-            }
+                if (erro.name === 'AbortError') {
+                    processos[i].status = 'cancelado';
+                    renderizarTabela();
 
+                    for (let j = i + 1; j < processos.length; j++) {
+                        processos[j].status = 'cancelado';
+                    }
+                    break;
+                }
+                mostrarModal(`Erro ao enviar para ${processos[i].email}:`, erro);
+                processos[i].status = 'erro';
+                break;
+            }
             renderizarTabela();
         }
 
         const todosEnviados = processos.every(p => p.status === 'enviado');
+        const algumCancelado = processos.some(p => p.status === 'cancelado');
+
         if (todosEnviados) {
-            alert('Todos os e-mails foram enviados com sucesso!');
+            mostrarModal('Todos os e-mails foram enviados com sucesso!', 'sucesso');
+        } else if (algumCancelado) {
+            mostrarModal('Envio cancelado pelo usuário.', 'erro');
         } else {
-            alert('Envio finalizado. Alguns e-mails falharam — verifique a tabela.');
+            mostrarModal('Envio finalizado. Alguns e-mails falharam — verifique a tabela.', 'erro');
         }
 
     } catch (error) {
         console.log('Erro:', error);
-        alert(error.message);
+        mostrarModal(error.message, 'erro');
     };
 }
 
 function baixarCSV() {
+    if (processos.length === 0) {
+        mostrarModal('Nenhum processo encontrado para gerar o relatório.', 'erro');
+        return;
+    }
     const csvContent = "data:text/csv;charset=utf-8,\n" +
         processos.map(p => `${p.nome},${p.email},${p.status}`).join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -167,9 +208,14 @@ function baixarCSV() {
 };
 
 function cancelarEnvio() {
+    if (abortController) {
+        cancelado = true;
+        abortController.abort();
+    }
     processos.forEach(p => {
         if (p.status === 'enviando') {
             p.status = 'cancelado';
+
         }
     });
     renderizarTabela();

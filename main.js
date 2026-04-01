@@ -10,15 +10,15 @@ const mainWindow = () => {
             preload: path.join(__dirname, 'preload.js')
         }
     });
-    win.removeMenu();
+    //win.removeMenu();
     win.loadFile('./view/index.html');
 }
 
 app.whenReady().then(() => {
     mainWindow();
 
-    app.on('window-all-closed', () =>{
-        if(process.platform !== 'darwin') {
+    app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') {
             app.quit();
         }
     });

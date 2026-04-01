@@ -11,6 +11,36 @@ const subMenu = document.getElementById('sub_menu');
 const tokenAPI = document.getElementById('token_api');
 const nav = document.querySelector('nav');
 
+// elementos do modal de feedback
+const modalFeedback = document.getElementById('dialog_feedback');
+const modalMensagem = document.getElementById('dialog_mensagem');
+const modalIconeI = document.getElementById('dialog_icone_i');
+const modalFechar = document.getElementById('dialog_fechar');
+
+// função utilitária para exibir modal de feedback
+function mostrarModal(mensagem, tipo = 'erro') {
+    modalFeedback.classList.remove('dialog_sucesso', 'dialog_erro');
+    if (tipo === 'sucesso') {
+        modalFeedback.classList.add('dialog_sucesso');
+        modalIconeI.className = 'bi bi-check-circle-fill';
+    } else {
+        modalFeedback.classList.add('dialog_erro');
+        modalIconeI.className = 'bi bi-x-circle-fill';
+    }
+    modalMensagem.textContent = mensagem;
+    modalFeedback.showModal();
+}
+
+modalFechar.addEventListener('click', () => {
+    modalFeedback.close();
+});
+
+modalFeedback.addEventListener('click', (e) => {
+    if (e.target === modalFeedback) {
+        modalFeedback.close();
+    }
+});
+
 window.addEventListener('scroll', () => {
     if (window.scrollY > 10) {
         nav.classList.add('scrolled');
@@ -57,7 +87,7 @@ if (containerUpload) {
 arquivoInput.addEventListener('change', async function () {
     try {
         if (!arquivoInput.files || arquivoInput.files.length === 0) {
-            alert('Nenhum arquivo selecionado!');
+            mostrarModal('Nenhum arquivo selecionado!', 'erro');
             containerUpload.classList.remove('arquivo_carregado');
             return;
         }
@@ -68,7 +98,7 @@ arquivoInput.addEventListener('change', async function () {
 
         document.getElementById('nome_arquivo').innerHTML = nomeArquivo;
 
-        const linhas = conteudoValidado.split('\n').slice(0, 6);
+        const linhas = conteudoValidado.split('\n').slice(0, 10);
         document.getElementById('conteudo_arquivo').textContent = linhas.join('\n');
 
         // Atualizar visual do upload para estado "carregado"
@@ -79,7 +109,7 @@ arquivoInput.addEventListener('change', async function () {
         if (headerEl) { headerEl.textContent = `Arquivo "${nomeArquivo}" carregado!` };
 
     } catch (error) {
-        alert(error.message);
+        mostrarModal(error.message, 'erro');
         containerUpload.classList.remove('arquivo_carregado');
     }
 });
@@ -106,11 +136,27 @@ if (anexoInput && anexoLabel) {
 
 // realizar o envio dos e-mails
 botaoEnviar.addEventListener('click', async function () {
+    const arquivo = arquivoInput.files[0];
+    const assunto = document.getElementById('assunto_email').value.trim();
+    const corpo = document.getElementById('mensagem_email').value.trim();
+
+    if (!arquivo) {
+        mostrarModal('Anexe um arquivo CSV antes de enviar.', 'erro');
+        return;
+    }
+    if (!assunto) {
+        mostrarModal('Preencha o assunto do e-mail.', 'erro');
+        return;
+    }
+    if (!corpo) {
+        mostrarModal('Preencha o corpo do e-mail.', 'erro');
+        return;
+    }
+
     try {
-        const arquivo = arquivoInput.files[0];
         await enviarEmails(arquivo);
     } catch (error) {
-        alert(error.message);
+        mostrarModal(error.message, 'erro');
     }
 });
 
@@ -146,16 +192,22 @@ modalConfig.addEventListener('click', (e) => {
 
 // salvar as configurações
 salvarConfigsBtn.addEventListener('click', () => {
-    //const tema = document.getElementById('seletor_tema').value;
     tokenAPI.value = tokenAPI.value.trim();
+    orgao.value = orgao.value.trim();
+    if (orgao.value) {
+        localStorage.setItem('orgao', orgao.value);
+    } else {
+        mostrarModal('Orgão é obrigatório para enviar os e-mails.', 'erro');
+        return;
+    }
     if (tokenAPI.value) {
         localStorage.setItem('tokenAPI', tokenAPI.value);
     } else {
-        alert('Token API é obrigatório para enviar os e-mails.');
+        mostrarModal('Token API é obrigatório para enviar os e-mails.', 'erro');
         return;
     }
     modalConfig.classList.remove('mostrar');
-    alert('Configurações salvas com sucesso!');
+    mostrarModal('Configurações salvas com sucesso!', 'sucesso');
 });
 
 configMenu.addEventListener('click', () => {
