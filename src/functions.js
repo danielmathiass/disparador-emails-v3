@@ -118,7 +118,8 @@ async function enviarEmails(arquivo) {
             const dadosEnvio = {
                 nome: [processos[i].nome],
                 destinatarios: [processos[i].email],
-                assunto: assuntoEmail,
+                assunto: `${orgao} - ${assuntoEmail}`,
+                assuntoEmail,
                 corpo: corpoEmail,
             };
 
