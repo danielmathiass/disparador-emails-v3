@@ -1,0 +1,50 @@
+{
+  "name": "disparador-de-emails",
+  "description": "Aplicativo para disparo de emails em lote",
+  "version": "3.0.0",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "dist": "electron-builder"
+  },
+
+  "build": {
+    "appId": "com.daniel.disparador",
+    "productName": "Disparador de E-mails",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icons/icon-v3.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "assets/icons/icon-v3.ico",
+      "uninstallerIcon": "assets/icons/icon-v3.ico",
+      "installerHeaderIcon": "assets/icons/icon-v3.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Disparador de E-mails Em Lote",
+      "artifactName": "Setup-Disparador-Emails-${version}.${ext}"
+    }
+  },  
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@electron/fuses": "^1.8.0",
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "electron-icon-maker": "^0.0.5"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1",
+    "electron-squirrel-startup": "^1.0.1"
+  }
+}

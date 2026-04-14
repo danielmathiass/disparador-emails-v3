@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="styles/font/bootstrap-icons.css">
+    <title>Disparador de E-mails em Lote</title>
+</head>
+
+<body>
+    <div class="caixa_principal">
+
+        <!-- campo - Navbar -->
+        <div class="barra_navegacao">
+            <nav class="nav_principal">
+                <i id="logo" class="bi bi-send"></i>
+                <div class="menu">
+                    <i id="menu_icon" class="bi bi-list"></i>
+                    <ul id="sub_menu" class="sub_menu">
+                        <li><a href="#" id="config_menu">Configurações</a></li>
+                        <li><a href="#" id="sobre_menu">Sobre</a></li>
+                        <li><a href="#" id="sair_menu">Sair</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <h2 id="texto_header">
+            Bem-Vindo(a) ao Disparador de E-mails em Lote!
+        </h2>
+
+        <!-- campo - Drag and Drop -->
+        <div class="layout_principal">
+            <div class="card_esquerdo">
+                <div class="container_upload">
+                    <div class="conteudo_caixa_upload">
+                        <div class="icon"><i class="bi bi-cloud-upload"></i></div>
+                        <div class="conteudo">
+                            <header>Arraste e Solte o arquivo </header>
+                            <span>ou</span>
+                            <input type="file" name="input_arquivo" id="input_arquivo" accept=".csv">
+                            <label id="label_input_arquivo" for="input_arquivo">
+                                Selecionar um arquivo...
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="caixa_nome_arquivo">
+                    <h3>Nome do arquivo: </h3>
+                    <p id="nome_arquivo"></p>
+                </div>
+            </div>
+
+            <div class="separador_vertical"></div>
+
+            <!-- campo - Instruções -->
+            <div class="caixa_instrucoes">
+                <h2>Instruções</h2>
+                <p>Para garantir o funcionamento correto do envio de e-mails em massa, <br>
+                    o arquivo CSV deve seguir o formato abaixo:
+                </p>
+                <p>Colunas obrigatórias:</p>
+                <div id="info_colunas">
+                    <div id="coluna_nome">NOME</div>
+                    <div id="coluna_email">EMAIL</div>
+                </div>
+                <p>Certifique-se de que cada coluna esteja devidamente preenchida e <br>
+                    que o arquivo estaja no formato CSV padrão (valores separados por vírgula).
+                </p>
+            </div>
+        </div>
+
+        <!-- campo - Pré-visualização do arquivo -->
+        <div class="pre_conteudo">
+            <h2>Pré-visualização</h2>
+            <div class="folha_caderno">
+                <pre id="conteudo_arquivo"></pre>
+            </div>
+        </div>
+
+        <!-- campo - Form de Disparo -->
+        <div class="caixa_disparo">
+            <h2>Informações para disparo do e-mail</h2>
+            <div class="caixa_formulario">
+                <label for="assunto_email">Asunto do E-mail</label> <br>
+                <input type="text" id="assunto_email" name="assunto_email"> <br>
+                <label for="mensagem_email">Mensagem do E-mail</label> <br>
+                <input type="text" id="mensagem_email" name="mensagem_email"> <br>
+                <label id="arquivo_input_label" for="arquivo_formulario">
+                    <i id="anexo_icone" class="bi bi-paperclip"></i>
+                    <span id="anexo_texto">Clique aqui para adicionar um anexo (Opcional)</span>
+                </label> <br>
+                <input type="file" id="arquivo_formulario" hidden> <br>
+                <button id="botao_envio" type="submit">Enviar</button>
+            </div>
+        </div>
+
+        <!-- campo - Tabela de processamento -->
+        <div class="caixa_processamento">
+            <h2>Processamento</h2>
+            <div class="container">
+                <table id="tabela_processos">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo_tabela">
+                        <!-- campo - Corpo da tabela(js) -->
+                    </tbody>
+                </table>
+
+                <div class="actions">
+                    <button class="botao_download" onclick="baixarCSV()">Baixe relatório .csv</button>
+                    <button class="botao_cancelar" onclick="cancelarEnvio()">Cancelar Envio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div id="modal_config" class="modal_overlay">
+        <div class="modal_caixa">
+            <div class="modal_cabecalho">
+                <h2>Configurações</h2>
+                <button id="fechar_modal">&times;</button>
+            </div>
+            <div class="modal_corpo">
+                <div class="grupo_input">
+                    <label for="orgao">Orgão</label>
+                    <input type="text" id="orgao">
+                    <label for="token_api">Token API</label>
+                    <input type="password" id="token_api">
+                </div>
+            </div>
+            <div class="modal_rodape">
+                <button id="salvar_configs" class="botao_primario">Salvar Configurações</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_sobre" class="modal_overlay">
+        <div class="modal_caixa">
+            <div class="modal_cabecalho">
+                <h2>Sobre</h2>
+                <button id="fechar_modal_sobre">&times;</button>
+            </div>
+            <div class="modal_corpo">
+                <div class="grupo_sobre">
+                    <p>Agência Estadual de Tecnologia da Informação - <span>ATI</span></p>
+                    <p>Diretoria de Sistemas de Informação e Governo Digital - <span>DSIGD</span></p>
+                    <p>Desenvolvedor: <span>Daniel Silva Mathias</span></p>
+                    <p>Versão: <span>3.0.0</span></p>
+                    <p>Ano: <span>2026</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Feedback (Sucesso/Erro) -->
+    <dialog id="dialog_feedback" class="dialog_feedback">
+        <div class="dialog_caixa">
+            <div class="dialog_icone" id="dialog_icone">
+                <i id="dialog_icone_i" class="bi bi-check-circle-fill"></i>
+            </div>
+            <p id="dialog_mensagem" class="dialog_mensagem"></p>
+            <button id="dialog_fechar" class="dialog_botao_fechar">OK</button>
+        </div>
+    </dialog>
+
+    <dialog id="dialog_sair" class="dialog_sair">
+        <div class="dialog_caixa">
+            <div class="dialog_icone" id="dialog_icone_sair">
+                <i id="dialog_icone_i_sair" class="bi bi-patch-question"></i>
+            </div>
+            <p id="dialog_mensagem_sair" class="dialog_mensagem">Deseja realmente sair do aplicativo?</p>
+            <div class="dialog_acoes">
+                <button id="dialog_sair_sim" class="dialog_botao_fechar">Sim</button>
+                <button id="dialog_sair_nao" class="dialog_botao_fechar">Não</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse/papaparse.min.js"></script>
+    <script src="../src/script.js"></script>
+    <script src="../src/functions.js"></script>
+</body>
+
+</html>

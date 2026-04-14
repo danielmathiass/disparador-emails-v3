@@ -1,0 +1,10 @@
+node_modules/
+out/
+dist/
+*.rpm
+*.deb
+*.exe
+*.dmg
+*.AppImage
+*.zip
+
