@@ -30,7 +30,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Disparador de E-mails Em Lote",
-      "artifactName": "Setup-Disparador-Emails-${version}.${ext}"
+      "artifactName": "Setup-Disparador-Emails-${version}.${ext}",
+      "installerSidebar": "assets/installer/sidebar.bmp"
     }
   },  
   "keywords": [],
